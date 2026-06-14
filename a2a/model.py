@@ -3,6 +3,16 @@ from typing import Any , Optional , Literal
 from datetime import datetime, timezone
 import uuid
 
+TaskState = Literal[
+    "submitted",
+    "working",
+    "input-required",
+    "completed",
+    "canceled",
+    "failed",
+    "unknown",
+]
+
 class TextPart(BaseModel):
     type: Literal["text", "text/plain"]
     text: str
@@ -34,3 +44,15 @@ class Artifact(BaseModel):
     append : Optional[bool]
     lastChunk:Optional[bool]
 
+class Task(BaseModel):
+    id : str
+    sessionId:str
+    status:TaskStatus
+
+class TaskStatus:
+    state:TaskState
+    message:Optional[Message]
+    timestamp:Optional[str]
+
+class TaskSendParams(BaseModel):
+    
