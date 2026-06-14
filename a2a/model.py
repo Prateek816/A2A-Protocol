@@ -44,15 +44,146 @@ class Artifact(BaseModel):
     append : Optional[bool]
     lastChunk:Optional[bool]
 
+class TaskStatus(BaseModel):
+    state:TaskState
+    message:Optional[Message]
+    timestamp:Optional[str]
+
 class Task(BaseModel):
     id : str
     sessionId:str
     status:TaskStatus
 
-class TaskStatus:
-    state:TaskState
-    message:Optional[Message]
-    timestamp:Optional[str]
+class PushNotificationConfig(BaseModel):
+    config:Optional[dict[str,Any]]
 
 class TaskSendParams(BaseModel):
-    
+    id:str
+    sessionId:Optional[str]
+    message:Message
+    historyLength:Optional[int]
+    pushNotification:Optional[PushNotificationConfig]
+    metadata:Optional[dict[str,Any]]
+
+class TaskStatusUpdateEvent(BaseModel):
+    id:str
+    status:TaskStatus
+    final:bool
+    metadata:Optional[dict[str,Any]]
+
+class TaskArtifactUpdateEvent(BaseModel):
+    id:str
+    artifact:Artifact
+    metadata:Optional[dict[str,Any]]
+
+from typing import Optional
+from pydantic import BaseModel, Field
+
+
+class Provider(BaseModel):
+    organization: str = Field(
+        description="Organization providing the agent."
+    )
+    url: str = Field(
+        description="Provider website URL."
+    )
+
+
+class Capabilities(BaseModel):
+    streaming: Optional[bool] = Field(
+        default=None,
+        description="Whether the agent supports streaming responses (e.g. SSE)."
+    )
+    pushNotifications: Optional[bool] = Field(
+        default=None,
+        description="Whether the agent can push task updates to clients."
+    )
+    stateTransitionHistory: Optional[bool] = Field(
+        default=None,
+        description="Whether the agent exposes task state transition history."
+    )
+
+
+class Authentication(BaseModel):
+    schemes: list[str] = Field(
+        description="Supported authentication schemes such as Bearer or Basic."
+    )
+    credentials: Optional[str] = Field(
+        default=None,
+        description="Credentials for accessing private agents."
+    )
+
+
+class Skill(BaseModel):
+    id: str = Field(
+        description="Unique skill identifier."
+    )
+    name: str = Field(
+        description="Human-readable skill name."
+    )
+    description: str = Field(
+        description="Description of the skill."
+    )
+    tags: list[str] = Field(
+        description="Tags describing the skill category."
+    )
+    examples: Optional[list[str]] = Field(
+        default=None,
+        description="Example prompts or scenarios for this skill."
+    )
+    inputModes: Optional[list[str]] = Field(
+        default=None,
+        description="Supported input MIME types for this skill."
+    )
+    outputModes: Optional[list[str]] = Field(
+        default=None,
+        description="Supported output MIME types for this skill."
+    )
+
+
+class AgentCard(BaseModel):
+    name: str = Field(
+        description="Human-readable agent name."
+    )
+
+    description: str = Field(
+        description="Description of the agent."
+    )
+
+    url: str = Field(
+        description="URL where the agent is hosted."
+    )
+
+    provider: Optional[Provider] = Field(
+        default=None,
+        description="Information about the service provider."
+    )
+
+    version: str = Field(
+        description="Agent version."
+    )
+
+    documentationUrl: Optional[str] = Field(
+        default=None,
+        description="URL to the agent documentation."
+    )
+
+    capabilities: Capabilities = Field(
+        description="Capabilities supported by the agent."
+    )
+
+    authentication: Authentication = Field(
+        description="Authentication requirements."
+    )
+
+    defaultInputModes: list[str] = Field(
+        description="Default supported input MIME types."
+    )
+
+    defaultOutputModes: list[str] = Field(
+        description="Default supported output MIME types."
+    )
+
+    skills: list[Skill] = Field(
+        description="Collection of skills supported by the agent."
+    )
