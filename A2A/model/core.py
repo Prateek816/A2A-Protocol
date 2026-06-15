@@ -90,6 +90,19 @@ class TaskArtifactUpdateEvent(BaseModel):
     artifact:Artifact
     metadata:Optional[dict[str,Any]]
 
+class TaskRequest(BaseModel):
+    session_id: str
+    message: Message
+    metadata: dict = {}
+
+class TaskStatusUpdate(BaseModel):
+    task_id: str
+    status: TaskStatus
+    message: Optional[Message] = None
+    artifact: Optional[Artifact] = None
+    confidence: float = 1.0
+    final: bool = False
+
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -202,15 +215,3 @@ class AgentCard(BaseModel):
         description="Collection of skills supported by the agent."
     )
 
-class TaskRequest(BaseModel):
-    session_id: str
-    message: Message
-    metadata: dict = {}
-
-class TaskStatusUpdate(BaseModel):
-    task_id: str
-    status: TaskStatus
-    message: Optional[Message] = None
-    artifact: Optional[Artifact] = None
-    confidence: float = 1.0
-    final: bool = False

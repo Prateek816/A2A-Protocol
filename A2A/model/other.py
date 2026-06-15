@@ -19,8 +19,16 @@ class EventQueue:
     async def get_event(self) -> Event:
         return await self._queue.get()
     
-class RequestContext:
+    async def publish(self, event: Event):
+        await self._queue.put(event)
+
+    async def next(self):
+        return await self._queue.get()
+    
+from pydantic import BaseModel
+
+class RequestContext(BaseModel):
     message: Message
-    current_task: Task | None
+    current_task: Task | None = None
     request_id: str
-    requested_extensions: set[str]
+    requested_extensions: set[str] = set()
