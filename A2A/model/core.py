@@ -1,3 +1,9 @@
+"""Core Concepts -
+Tasks are core concept in A2A proptocol , they are created by the client , the state is maintained by remote server , Multiple Tasks can belong to the same session via optional sessionID
+Upon recieving the task request agent can satisfy request , schdule , reject , negotiate a different execution method , request more information from the client and delegate to other agents or systems
+
+"""
+
 from pydantic import BaseModel , JsonValue , Field
 from typing import Any , Optional , Literal
 from datetime import datetime, timezone
@@ -32,9 +38,13 @@ Part = TextPart | JsonPart | FilePart
 class Message(BaseModel):
     role: Literal["user", "agent"]
     parts: list[Part]
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    taskId:Optional[str]
     metadata : dict[str,Any]
 
+"Artifact are the standard way to convey the final output of an agent in the A2A protocol"
 class Artifact(BaseModel):
     name:Optional[str]
     description:Optional[str]
@@ -49,10 +59,14 @@ class TaskStatus(BaseModel):
     message:Optional[Message]
     timestamp:Optional[str]
 
+"""Tasks are core concept in A2A proptocol , they are created by the client , the state is maintained by remote server , Multiple Tasks can belong to the same session via optional sessionID
+Upon recieving the task request agent can satisfy request , schdule , reject , negotiate a different execution method , request more information from the client and delegate to other agents or systems"""
 class Task(BaseModel):
     id : str
     sessionId:str
     status:TaskStatus
+    history:Optional[list[Message]]
+    artifacts:Optional[list[Artifact]]
 
 class PushNotificationConfig(BaseModel):
     config:Optional[dict[str,Any]]
