@@ -201,3 +201,16 @@ class AgentCard(BaseModel):
     skills: list[Skill] = Field(
         description="Collection of skills supported by the agent."
     )
+
+class TaskRequest(BaseModel):
+    session_id: str
+    message: Message
+    metadata: dict = {}
+
+class TaskStatusUpdate(BaseModel):
+    task_id: str
+    status: TaskStatus
+    message: Optional[Message] = None
+    artifact: Optional[Artifact] = None
+    confidence: float = 1.0
+    final: bool = False
